@@ -1,30 +1,38 @@
-(let ((cwvh:path "/usr/local/bin:/bin:/usr/bin:~/go/bin"))
+(let ((cwvh:path "/Users/cwvh/.cabal/bin:/usr/local/bin:/usr/bin/"))
   (setenv "PATH" cwvh:path)
   (setq exec-path (split-string cwvh:path path-separator)))
 
+(setq initial-scratch-message nil)
 (setq inhibit-startup-message t)
-(setq-default tab-width 8)
+(setq-default tab-width 4)
 (setq-default indent-tabs-mode nil)
 (prefer-coding-system 'utf-8)
 (setq make-backup-files nil)
 (setq auto-save-default nil)
+(global-font-lock-mode t)
 
 (setq ring-bell-function 'ignore)
 (global-unset-key "\C-z")
 
 (fset 'yes-or-no-p 'y-or-n-p)
+(iswitchb-mode 1)
+(icomplete-mode 1)
+
+(if (display-graphic-p)
+    (progn
+      (scroll-bar-mode -1)
+      (tool-bar-mode -1)
+      (tooltip-mode -1)
+      (set-frame-font "Menlo-12")
+      (load-theme 'tango-dark))
+  ;; -nw
+    (menu-bar-mode -1))
 
 (delete-selection-mode t)
-(scroll-bar-mode -1)
-(tool-bar-mode -1)
 (blink-cursor-mode t)
 (show-paren-mode t)
 (column-number-mode t)
-(set-fringe-style -1)
-(tooltip-mode -1)
-
-(set-frame-font "Menlo-12")
-(load-theme 'wombat)
+;(set-fringe-style -1)
 
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
@@ -35,35 +43,53 @@
      (define-key shell-mode-map "\C-p" 'comint-previous-input)
      (define-key shell-mode-map "\C-n" 'comint-next-input)))
 
-;; el-get
-(add-to-list 'load-path "~/.emacs.d/el-get/el-get")
-(unless (require 'el-get nil t)
-  (with-current-buffer
-      (url-retrieve-synchronously
-       "https://raw.github.com/dimitri/el-get/master/el-get-install.el")
-    (end-of-buffer)
-    (eval-print-last-sexp)))
-(el-get 'sync)
+(require 'package)
+(add-to-list 'package-archives
+             '("marmalade" . "http://marmalade-repo.org/packages/"))
+(package-initialize)
 
-;; Go
-(add-to-list 'load-path "~/go/misc/emacs" t)
-(require 'go-mode-load)
-(add-hook 'before-save-hook #'gofmt-before-save)
+(define-key global-map (kbd "RET") 'newline-and-indent)
 
 (defun cwvh:c-initialization-hook ()
-  (define-key c-mode-base-map (kbd "RET") 'newline-and-indent))
+  (define-key c-mode-base-map (kbd "RET") 'newline-and-indent)
+  (setq c-basic-offset 4
+        tab-with 4
+        indent-tabs-mode nil))
 (add-hook 'c-initialization-hook 'cwvh:c-initialization-hook)
 
 (defun cwvh:c-mode-hook ()
-  (c-set-style "linux")
-  (setq c-basic-offset 8
-        tab-width 8
-        indent-tabs-mode t))
+  (c-set-style "k&r"))
 (add-hook 'c-mode-hook 'cwvh:c-mode-hook)
 
 (defun cwvh:c++-mode-hook ()
-  (c-set-style "stroustrup")
-  (setq c-basic-offset 4
-        tab-width 4
-        indent-tabs-mode nil))
+  (c-set-style "stroustrup"))
 (add-hook 'c++-mode-hook 'cwvh:c++-mode-hook)
+
+;(defun cwvh:slime-common-lisp ()
+;  (interactive)
+;  (setq inferior-lisp-program "sbcl")
+;  (add-to-list 'load-path "~/.emacs.d/slime-2012-04-24")
+;  (require 'slime)
+;  (setq slime-protocol-version 'ignore)
+;  (slime-setup '(slime-fancy))
+;  (define-key slime-mode-map (kbd "<tab>") 'slime-indent-and-complete-symbol))
+
+;; (defun turn-on-paredit () (paredit-mode 1))
+;; (add-hook 'clojure-mode-hook 'turn-on-paredit)
+;; (add-hook 'slime-repl-mode-hook
+;;           (defun clojure-mode-slime-font-lock ()
+;;             (require 'clojure-mode)
+;;             (let (font-lock-mode)
+;;               (clojure-mode-font-lock-setup))))
+
+;; (defun cwvh:slime-common-lisp ()
+;;   (add-to-list 'load-path "~/.emacs.d/slime")
+;;   (setq inferior-lisp-program "sbcl")
+;;   (require 'slime)
+;;   (slime-setup '(slime-fancy))
+;;   (define-key slime-mode-map (kbd "<tab>") 'slime-indent-and-complete-symbol))
+(add-to-list 'load-path "~/.cabal/share/ghc-mod-1.11.3")
+(autoload 'ghc-init "ghc" nil t)
+(add-hook 'haskell-mode-hook (lambda () (ghc-init)))
+(add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
+(add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
