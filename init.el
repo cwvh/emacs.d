@@ -18,7 +18,7 @@
 (iswitchb-mode 1)
 (icomplete-mode 1)
 
-(if (display-graphic-p)
+(if (window-system)
     (progn
       (scroll-bar-mode -1)
       (tool-bar-mode -1)
@@ -34,6 +34,15 @@
 (column-number-mode t)
 ;(set-fringe-style -1)
 
+(if (or (eq window-system 'ns)
+        (eq window-system 'mac))
+    (progn
+      (setq mac-command-modifier 'meta)
+      ;(setq mac-option-modifier nil)
+      ;(setq ns-function-modifier 'hyper)
+      ;; keybinding to toggle fullscreen
+      (global-set-key (quote [M-f10]) (quote ns-toggle-fullscreen))))
+
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 (eval-after-load 'shell
@@ -47,6 +56,9 @@
 (add-to-list 'package-archives
              '("marmalade" . "http://marmalade-repo.org/packages/"))
 (package-initialize)
+
+(require 'hungry-delete)
+(global-hungry-delete-mode)
 
 (define-key global-map (kbd "RET") 'newline-and-indent)
 
@@ -88,8 +100,19 @@
 ;;   (require 'slime)
 ;;   (slime-setup '(slime-fancy))
 ;;   (define-key slime-mode-map (kbd "<tab>") 'slime-indent-and-complete-symbol))
+
 (add-to-list 'load-path "~/.cabal/share/ghc-mod-1.11.3")
 (autoload 'ghc-init "ghc" nil t)
-(add-hook 'haskell-mode-hook (lambda () (ghc-init)))
-(add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
-(add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
+(defun cwvh:haskell-mode-hook ()
+  (set (make-local-variable 'require-final-newline) t)
+  (turn-on-haskell-decl-scan)
+  (turn-on-haskell-doc-mode)
+  (turn-on-haskell-indentation)
+  (setq tab-width 4
+        haskell-indent-offset 4
+        haskell-indentation-layout-offset 4
+        haskell-indentation-left-offset 4
+        haskell-indentation-ifte-offset 4)
+  (auto-fill-mode)
+  (ghc-init))
+(add-hook 'haskell-mode-hook 'cwvh:haskell-mode-hook)
