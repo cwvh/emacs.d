@@ -77,14 +77,12 @@
   (c-set-style "stroustrup"))
 (add-hook 'c++-mode-hook 'cwvh:c++-mode-hook)
 
-;(defun cwvh:slime-common-lisp ()
-;  (interactive)
-;  (setq inferior-lisp-program "sbcl")
-;  (add-to-list 'load-path "~/.emacs.d/slime-2012-04-24")
-;  (require 'slime)
-;  (setq slime-protocol-version 'ignore)
-;  (slime-setup '(slime-fancy))
-;  (define-key slime-mode-map (kbd "<tab>") 'slime-indent-and-complete-symbol))
+(load (expand-file-name "~/quicklisp/slime-helper.el"))
+(setq inferior-lisp-program "sbcl")
+(add-hook 'slime-mode-hook
+  (lambda ()
+    (define-key slime-mode-map (kbd "<tab>") 'slime-fuzzy-indent-and-complete-symbol)
+    (paredit-mode +1)))
 
 ;; (defun turn-on-paredit () (paredit-mode 1))
 ;; (add-hook 'clojure-mode-hook 'turn-on-paredit)
