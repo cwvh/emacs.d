@@ -84,22 +84,7 @@
     (define-key slime-mode-map (kbd "<tab>") 'slime-fuzzy-indent-and-complete-symbol)
     (paredit-mode +1)))
 
-;; (defun turn-on-paredit () (paredit-mode 1))
-;; (add-hook 'clojure-mode-hook 'turn-on-paredit)
-;; (add-hook 'slime-repl-mode-hook
-;;           (defun clojure-mode-slime-font-lock ()
-;;             (require 'clojure-mode)
-;;             (let (font-lock-mode)
-;;               (clojure-mode-font-lock-setup))))
-
-;; (defun cwvh:slime-common-lisp ()
-;;   (add-to-list 'load-path "~/.emacs.d/slime")
-;;   (setq inferior-lisp-program "sbcl")
-;;   (require 'slime)
-;;   (slime-setup '(slime-fancy))
-;;   (define-key slime-mode-map (kbd "<tab>") 'slime-indent-and-complete-symbol))
-
-(add-to-list 'load-path "~/.cabal/share/ghc-mod-1.11.3")
+(add-to-list 'load-path "~/.cabal/share/ghc-mod-1.12.4")
 (autoload 'ghc-init "ghc" nil t)
 (defun cwvh:haskell-mode-hook ()
   (set (make-local-variable 'require-final-newline) t)
