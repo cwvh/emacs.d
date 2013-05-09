@@ -70,7 +70,7 @@
 (add-hook 'c-initialization-hook 'cwvh:c-initialization-hook)
 
 (defun cwvh:c-mode-hook ()
-  (c-set-style "k&r"))
+  (c-set-style "linux"))
 (add-hook 'c-mode-hook 'cwvh:c-mode-hook)
 
 (defun cwvh:c++-mode-hook ()
