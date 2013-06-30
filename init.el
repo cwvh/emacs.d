@@ -1,7 +1,3 @@
-(let ((cwvh:path "/Users/cwvh/.cabal/bin:/usr/local/bin:/usr/bin/"))
-  (setenv "PATH" cwvh:path)
-  (setq exec-path (split-string cwvh:path path-separator)))
-
 (setq initial-scratch-message nil)
 (setq inhibit-startup-message t)
 (setq-default tab-width 4)
@@ -24,7 +20,7 @@
       (tool-bar-mode -1)
       (tooltip-mode -1)
       (set-frame-font "Menlo-12")
-      (load-theme 'tango-dark))
+      (load-theme 'tango))
   ;; -nw
     (menu-bar-mode -1))
 
@@ -62,6 +58,16 @@
 
 (define-key global-map (kbd "RET") 'newline-and-indent)
 
+(eval-after-load 'tramp '(setenv "SHELL" "/bin/bash"))
+(setq tramp-default-method "ssh")
+(require 'tramp)
+
+;; Fix for Emacs binaries under Mac having the wrong $PATH.
+;; If a particular shell variable is needed:
+;; (exec-path-from-shell-copy-env "SHELLVAR")
+(when (memq window-system '(mac ns))
+  (exec-path-from-shell-initialize))
+
 (defun cwvh:c-initialization-hook ()
   (define-key c-mode-base-map (kbd "RET") 'newline-and-indent)
   (setq c-basic-offset 4
@@ -73,9 +79,18 @@
   (c-set-style "linux"))
 (add-hook 'c-mode-hook 'cwvh:c-mode-hook)
 
+(c-add-style "tc++pl"
+             '("stroustrup"
+               (c-offsets-alist
+                (inline-open . 0))))
+
 (defun cwvh:c++-mode-hook ()
-  (c-set-style "stroustrup"))
+  (c-set-style "tc++pl"))
 (add-hook 'c++-mode-hook 'cwvh:c++-mode-hook)
+
+;(defun cwvh:c-mode-common-hook ()
+;  (c-toggle-hungry-state 1))
+;(add-hook 'c-mode-common-hook 'cwvh:c-mode-common-hook)
 
 (load (expand-file-name "~/quicklisp/slime-helper.el"))
 (setq inferior-lisp-program "sbcl")
