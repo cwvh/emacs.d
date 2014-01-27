@@ -1,6 +1,6 @@
 (setq initial-scratch-message nil)
 (setq inhibit-startup-message t)
-(setq-default tab-width 4)
+(setq-default tab-width 2)
 (setq-default indent-tabs-mode nil)
 (prefer-coding-system 'utf-8)
 (setq make-backup-files nil)
@@ -14,30 +14,35 @@
 (iswitchb-mode 1)
 (icomplete-mode 1)
 
-(if (window-system)
+(auto-fill-mode 1)
+(setq fill-column 79)
+
+(require 'package)
+(add-to-list 'package-archives
+             '("melpa" . "http://melpa.milkbox.net/packages/") t)
+(when (< emacs-major-version 24)
+  (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
+(package-initialize)
+
+(if window-system
     (progn
       (scroll-bar-mode -1)
       (tool-bar-mode -1)
       (tooltip-mode -1)
-      (set-frame-font "Menlo-12")
-      (load-theme 'tango))
+      (set-frame-font "Anonymous Pro-13"))
   ;; -nw
-    (menu-bar-mode -1))
+  (menu-bar-mode -1))
+(load-theme 'moe-dark t)
 
 (delete-selection-mode t)
 (blink-cursor-mode t)
 (show-paren-mode t)
 (column-number-mode t)
-;(set-fringe-style -1)
 
-(if (or (eq window-system 'ns)
-        (eq window-system 'mac))
-    (progn
-      (setq mac-command-modifier 'meta)
-      ;(setq mac-option-modifier nil)
-      ;(setq ns-function-modifier 'hyper)
-      ;; keybinding to toggle fullscreen
-      (global-set-key (quote [M-f10]) (quote ns-toggle-fullscreen))))
+(when (memq window-system '(mac ns))
+  (progn
+    (setq mac-command-modifier 'meta)
+    (global-set-key (quote [M-f10]) (quote ns-toggle-fullscreen))))
 
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
@@ -48,23 +53,11 @@
      (define-key shell-mode-map "\C-p" 'comint-previous-input)
      (define-key shell-mode-map "\C-n" 'comint-next-input)))
 
-(require 'package)
-(add-to-list 'package-archives
-             '("marmalade" . "http://marmalade-repo.org/packages/"))
-(package-initialize)
-
-(require 'hungry-delete)
-(global-hungry-delete-mode)
-
-(define-key global-map (kbd "RET") 'newline-and-indent)
-
+(require 'tramp)
 (eval-after-load 'tramp '(setenv "SHELL" "/bin/bash"))
 (setq tramp-default-method "ssh")
-(require 'tramp)
 
-;; Fix for Emacs binaries under Mac having the wrong $PATH.
-;; If a particular shell variable is needed:
-;; (exec-path-from-shell-copy-env "SHELLVAR")
+(require 'exec-path-from-shell)
 (when (memq window-system '(mac ns))
   (exec-path-from-shell-initialize))
 
@@ -88,29 +81,19 @@
   (c-set-style "tc++pl"))
 (add-hook 'c++-mode-hook 'cwvh:c++-mode-hook)
 
-;(defun cwvh:c-mode-common-hook ()
-;  (c-toggle-hungry-state 1))
-;(add-hook 'c-mode-common-hook 'cwvh:c-mode-common-hook)
-
-(load (expand-file-name "~/quicklisp/slime-helper.el"))
+(require 'slime-autoloads)
 (setq inferior-lisp-program "sbcl")
-(add-hook 'slime-mode-hook
-  (lambda ()
-    (define-key slime-mode-map (kbd "<tab>") 'slime-fuzzy-indent-and-complete-symbol)
-    (paredit-mode +1)))
+(setq slime-contribs '(slime-fancy))
 
-(add-to-list 'load-path "~/.cabal/share/ghc-mod-1.12.4")
-(autoload 'ghc-init "ghc" nil t)
 (defun cwvh:haskell-mode-hook ()
-  (set (make-local-variable 'require-final-newline) t)
   (turn-on-haskell-decl-scan)
   (turn-on-haskell-doc-mode)
   (turn-on-haskell-indentation)
-  (setq tab-width 4
-        haskell-indent-offset 4
-        haskell-indentation-layout-offset 4
-        haskell-indentation-left-offset 4
-        haskell-indentation-ifte-offset 4)
-  (auto-fill-mode)
-  (ghc-init))
+  (setq tab-width 2
+        haskell-indent-offset 2
+        haskell-indentation-layout-offset 2
+        haskell-indentation-left-offset 2
+        haskell-indentation-ifte-offset 2))
 (add-hook 'haskell-mode-hook 'cwvh:haskell-mode-hook)
+
+(ido-mode)
