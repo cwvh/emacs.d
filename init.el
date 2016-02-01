@@ -107,6 +107,9 @@ re-downloaded in order to locate PACKAGE."
 
   (define-key evil-normal-state-map (kbd "C-p") 'helm-projectile)
   (define-key evil-normal-state-map (kbd "C-]") 'gtags-find-tag-from-here)
+  ;; Accept some of my quasi-vim brain damage.
+  (define-key evil-normal-state-map (kbd "C-k") (lambda () (interactive) (previous-line 6)))
+  (define-key evil-normal-state-map (kbd "C-j") (lambda () (interactive) (next-line 6)))
   ;; Accept some of my "set -o emacs" brain damage.
   (define-key evil-normal-state-map (kbd "C-a") 'beginning-of-line-text)
   (define-key evil-normal-state-map (kbd "C-e") 'end-of-line)
@@ -130,6 +133,16 @@ it takes a second \\[keyboard-quit] to abort the minibuffer."
   (define-key minibuffer-local-completion-map [escape] 'minibuffer-keyboard-quit)
   (define-key minibuffer-local-must-match-map [escape] 'minibuffer-keyboard-quit)
   (define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit))
+
+(use-package helm
+  :ensure t
+  :defer t
+  :diminish helm-mode
+  :init
+  (setq helm-buffers-fuzzy-matching t)
+  :config
+  (setq helm-autoresize-mode t)
+  (setq helm-buffer-max-length 40))
 
 (use-package evil
   :ensure t
@@ -160,16 +173,6 @@ it takes a second \\[keyboard-quit] to abort the minibuffer."
   :config
   (when (memq window-system '(mac ns))
     (exec-path-from-shell-initialize)))
-
-(use-package helm
-  :ensure t
-  :defer t
-  :diminish helm-mode
-  :init
-  (setq helm-buffers-fuzzy-matching t)
-  :config
-  (setq helm-autoresize-mode t)
-  (setq helm-buffer-max-length 40))
 
 (use-package company
   :ensure t
