@@ -7,7 +7,7 @@
       inhibit-startup-message t)
 
 ;; Set sensible defaults for all modes.
-(setq-default tab-width 2
+(setq-default tab-width 8
               indent-tabs-mode nil)
 (prefer-coding-system 'utf-8)
 (global-font-lock-mode t)
@@ -25,9 +25,12 @@
 (setq make-backup-files nil)
 
 ;; Get rid of audible bell and drop backgrounding since it crashes on Mac.
-(setq ring-bell-function 'ignore
-      visible-bell t)
+(setq ring-bell-function 'ignore visible-bell t)
 (global-unset-key "\C-z")
+
+;; Make the usual copy-paste keys behave as expected.
+(cua-mode 1)
+(transient-mark-mode 1)
 
 ;; Disable menu bars and stuff
 (if window-system
@@ -72,6 +75,9 @@ re-downloaded in order to locate PACKAGE."
 (maybe-require-package 'use-package)
 (eval-when-compile (require 'use-package))
 
+;; What follows are my insane ViM bindings that have come from
+;; years of not properly learning to use ViM. If you intend to
+;; use Evil mode, be sure to read through the key bindings first.
 (defun ascii:config-evil-leader ()
   "Configure evil leader mode."
   (evil-leader/set-leader ",")
@@ -148,24 +154,28 @@ it takes a second \\[keyboard-quit] to abort the minibuffer."
   :ensure t
   :config
   (add-hook 'evil-mode-hook 'ascii:config-evil)
-  (evil-mode 1)
+  ;; Uncomment to enable ViM on Emacs start-up.
+  ;; Evil mode can be turned on for any buffer with
+  ;; M-x evil-mode and turned off with M-x turn-off-evil-mode.
+;  (evil-mode 1)
 
   (use-package evil-leader
     :ensure t
     :config
     (global-evil-leader-mode)
-    (ascii:config-evil-leader)))
+    (ascii:config-evil-leader))
+
+  (use-package powerline-evil
+    :ensure t))
 
 (when (memq window-system '(mac ns))
   (setq ns-use-srgb-colorspace nil))
+
 (use-package powerline
   :ensure t
   :config
   (setq powerline-default-separator (if (display-graphic-p) 'slant
                                       nil)))
-
-(use-package powerline-evil
-  :ensure t)
 
 (use-package exec-path-from-shell
   :ensure t
@@ -204,7 +214,7 @@ it takes a second \\[keyboard-quit] to abort the minibuffer."
   :defer t
   :diminish ""
   :config
-  (setq-default highlight-symbol-idle-delay 1.5))
+  (setq-default highlight-symbol-idle-delay 0.5))
 
 (use-package magit
   :ensure t
@@ -222,3 +232,10 @@ it takes a second \\[keyboard-quit] to abort the minibuffer."
 (add-hook 'sh-mode-hook (lambda ()
                           (setq sh-basic-offset 2
                                 sh-indentation 2)))
+
+(setq c-default-style "stroustrup")
+(add-hook 'c-mode-common-hook '(lambda () (c-toggle-hungry-state 1)))
+
+;; Put site customization here. Good examples would
+;; be setting system-specific fonts and sizes.
+(load-file "~/.emacs.d/custom.el")
