@@ -1,7 +1,5 @@
 (package-initialize)
 
-(add-to-list 'exec-path "/usr/local/bin")
-
 ;; Keep start-up clean of banners.
 (setq initial-scratch-message nil
       inhibit-startup-message t)
@@ -179,7 +177,6 @@ it takes a second \\[keyboard-quit] to abort the minibuffer."
 
 (use-package exec-path-from-shell
   :ensure t
-  :defer t
   :config
   (when (memq window-system '(mac ns))
     (exec-path-from-shell-initialize)))
@@ -192,11 +189,45 @@ it takes a second \\[keyboard-quit] to abort the minibuffer."
   :config
   (setq company-idle-delay 0.5)
   (setq company-selection-wrap-around t)
+  (setq company-minimum-prefix-length 1)
+  (global-company-mode)
   (define-key company-active-map [tab] 'company-complete)
   (define-key company-active-map [kbd "C-n"] 'company-select-next)
   (define-key company-active-map [kbd "C-p"] 'company-select-previous))
 
-(use-package flycheck :ensure t)
+(use-package flycheck
+  :ensure t
+  :config
+  (global-flycheck-mode))
+
+(use-package rust-mode
+  :ensure t
+  :defer t)
+
+(use-package flycheck-rust
+  :ensure t
+  :defer t
+  :init
+  (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
+
+(use-package toml-mode
+  :ensure t
+  :defer t)
+
+(use-package racer
+  :ensure t
+  :config
+  (add-hook 'rust-mode-hook #'racer-mode)
+  (add-hook 'racer-mode-hook #'eldoc-mode)
+  (setq racer-cmd "/Users/cwvh/bin/racer")
+  (setq racer-rust-src-path "/Users/cwvh/src/rust/src/")
+  (local-set-key (kbd "M-.") #'racer-find-definition)
+  (local-set-key (kbd "TAB") #'racer-complete-or-indent))
+
+(use-package company-racer
+  :ensure t
+  :config
+  (set (make-local-variable 'company-backends) '(company-racer)))
 
 (use-package helm-projectile
   :commands (helm-projectile helm-projectile-switch-project)
